@@ -1,6 +1,7 @@
 import { GameResult } from '@/types/game';
 import { getCoachMessage } from '@/utils/scoring';
-import { Trophy, Target, Clock, Star } from 'lucide-react';
+import { Trophy, Target, Clock, Star, Lightbulb } from 'lucide-react';
+import { phrases } from '@/data/phrases';
 
 interface ResultsPanelProps {
   result: GameResult;
@@ -10,6 +11,11 @@ interface ResultsPanelProps {
 export function ResultsPanel({ result, formatTime }: ResultsPanelProps) {
   const message = getCoachMessage(result);
   const isPerfect = result.optimalCount === 4;
+  
+  // Find which optimal phrases were missed
+  const optimalPhrases = phrases.filter(p => p.optimal);
+  const selectedLabels = new Set(result.selectedPhrases.map(p => p.label));
+  const missedOptimal = optimalPhrases.filter(p => !selectedLabels.has(p.label));
 
   return (
     <section className="rounded-xl border border-border bg-secondary/30 p-4">
@@ -81,7 +87,31 @@ export function ResultsPanel({ result, formatTime }: ResultsPanelProps) {
         </div>
       </div>
 
-      <div className="text-sm font-medium">{message}</div>
+      <div className="text-sm font-medium mb-3">{message}</div>
+
+      {/* Improvement Tips */}
+      {missedOptimal.length > 0 && (
+        <div className="bg-[hsl(var(--info-bg))] border border-[hsl(var(--info-border))] rounded-lg p-3">
+          <div className="flex items-center gap-2 mb-2">
+            <Lightbulb className="w-4 h-4 text-[hsl(var(--info-foreground))]" />
+            <span className="font-semibold text-sm text-[hsl(var(--info-foreground))]">Next Time, Consider:</span>
+          </div>
+          <ul className="space-y-1.5 text-sm">
+            {missedOptimal.map((phrase) => (
+              <li key={phrase.label} className="flex items-start gap-2">
+                <Star className="w-3 h-3 text-yellow-500 mt-1 flex-shrink-0" />
+                <span>
+                  <strong>{phrase.category.charAt(0).toUpperCase() + phrase.category.slice(1)}:</strong>{' '}
+                  {phrase.label}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="text-xs text-muted-foreground mt-2">
+            These are the optimal phrases you missed. A strong prompt covers: incident, environment, constraints, and plan.
+          </p>
+        </div>
+      )}
     </section>
   );
 }
