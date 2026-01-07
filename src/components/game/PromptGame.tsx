@@ -150,13 +150,13 @@ export function PromptGame() {
           {/* Controls */}
           <div className="flex flex-col sm:flex-row gap-3">
             <Button
-              onClick={handleTest}
-              disabled={!canTest}
-              className="flex-1 gap-2 rounded-full shadow-button bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+              variant="secondary"
+              onClick={handleReset}
+              className="flex-1 gap-2 rounded-full"
               size="lg"
             >
-              <Rocket className="w-4 h-4" />
-              Test Your Prompt
+              <RotateCcw className="w-4 h-4" />
+              Reset & Shuffle
             </Button>
             <Button
               variant="outline"
@@ -168,13 +168,13 @@ export function PromptGame() {
               {showHint ? 'Hide Hint' : 'Show Hint'}
             </Button>
             <Button
-              variant="secondary"
-              onClick={handleReset}
-              className="flex-1 gap-2 rounded-full"
+              onClick={handleTest}
+              disabled={!canTest}
+              className="flex-1 gap-2 rounded-full shadow-button bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
               size="lg"
             >
-              <RotateCcw className="w-4 h-4" />
-              Reset & Shuffle
+              <Rocket className="w-4 h-4" />
+              Test Your Prompt
             </Button>
           </div>
 
