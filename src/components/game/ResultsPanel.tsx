@@ -1,6 +1,6 @@
 import { GameResult } from '@/types/game';
 import { getCoachMessage } from '@/utils/scoring';
-import { cn } from '@/lib/utils';
+import { Trophy, Target, Clock, Star } from 'lucide-react';
 
 interface ResultsPanelProps {
   result: GameResult;
@@ -8,52 +8,74 @@ interface ResultsPanelProps {
 }
 
 export function ResultsPanel({ result, formatTime }: ResultsPanelProps) {
-  const coachMessage = getCoachMessage(result.finalXP);
+  const message = getCoachMessage(result);
+  const isPerfect = result.optimalCount === 4;
 
   return (
-    <section className="rounded-xl border border-border bg-secondary/50 p-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-      <div className="flex items-center justify-between gap-2 mb-3 flex-wrap">
-        <h3 className="font-semibold text-foreground">Results</h3>
-        <span className="rounded-full bg-[hsl(var(--success-bg))] border border-[hsl(var(--success-border))] px-3 py-0.5 text-sm font-semibold text-[hsl(var(--success-foreground))] tabular-nums">
-          Final XP: {result.finalXP}
-        </span>
+    <section className="rounded-xl border border-border bg-secondary/30 p-4">
+      <div className="flex items-center justify-between gap-4 flex-wrap mb-4">
+        <div className="flex items-center gap-2">
+          {isPerfect ? (
+            <Trophy className="w-5 h-5 text-yellow-500" />
+          ) : (
+            <Target className="w-5 h-5 text-primary" />
+          )}
+          <span className="font-semibold text-lg">Results</span>
+        </div>
+        <div className={`rounded-full px-4 py-1 font-bold text-lg ${
+          isPerfect 
+            ? 'bg-yellow-100 text-yellow-700 border border-yellow-300' 
+            : 'bg-[hsl(var(--success-bg))] text-[hsl(var(--success-foreground))] border border-[hsl(var(--success-border))]'
+        }`}>
+          {result.totalScore} / {result.maxPossible} pts
+        </div>
       </div>
 
-      <div className="flex justify-between flex-wrap gap-1 text-xs text-muted-foreground mb-3">
-        <span>Elapsed: {formatTime(result.elapsedSeconds)}</span>
-        <span>
-          Selection: {result.relevantCount} relevant / {result.helpfulCount} helpful / {result.distractorCount} distractors
-        </span>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+        <div className="bg-card rounded-lg p-3 text-center border border-border">
+          <div className="text-2xl font-bold text-primary">{result.percentage}%</div>
+          <div className="text-xs text-muted-foreground">Score</div>
+        </div>
+        <div className="bg-card rounded-lg p-3 text-center border border-border">
+          <div className="text-2xl font-bold text-foreground flex items-center justify-center gap-1">
+            {result.optimalCount}<Star className="w-4 h-4 text-yellow-500" />
+          </div>
+          <div className="text-xs text-muted-foreground">Optimal Picks</div>
+        </div>
+        <div className="bg-card rounded-lg p-3 text-center border border-border">
+          <div className="text-2xl font-bold text-foreground flex items-center justify-center gap-1">
+            <Clock className="w-4 h-4" />{formatTime(result.elapsedSeconds)}
+          </div>
+          <div className="text-xs text-muted-foreground">Time</div>
+        </div>
+        <div className="bg-card rounded-lg p-3 text-center border border-border">
+          <div className="text-2xl font-bold text-foreground">4</div>
+          <div className="text-xs text-muted-foreground">Max Optimal</div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 text-sm mb-3">
-        <span className="text-muted-foreground">Relevant</span>
-        <span className="text-right font-medium tabular-nums">{result.relevantScore}</span>
-
-        <span className="text-muted-foreground">Helpful/Clarifying</span>
-        <span className="text-right font-medium tabular-nums">{result.helpfulScore}</span>
-
-        <span className="text-muted-foreground">Distractors</span>
-        <span className={cn("text-right font-medium tabular-nums", result.distractorScore < 0 && "text-destructive")}>
-          {result.distractorScore}
-        </span>
-
-        <span className="text-muted-foreground">Essentials</span>
-        <span className="text-right font-medium tabular-nums">{result.essentialsBonus}</span>
-
-        <span className="text-muted-foreground">Diversity</span>
-        <span className="text-right font-medium tabular-nums">{result.diversityBonus}</span>
-
-        <span className="text-muted-foreground">Time</span>
-        <span className={cn("text-right font-medium tabular-nums", result.timeBonus < 0 && "text-destructive")}>
-          {result.timeBonus}
-        </span>
-
-        <span className="font-semibold text-foreground">Final XP</span>
-        <span className="text-right font-semibold tabular-nums">{result.finalXP}</span>
+      <div className="bg-card rounded-lg p-3 border border-border mb-3">
+        <div className="text-sm font-medium mb-2">Your Selections:</div>
+        <div className="space-y-1">
+          {result.selectedPhrases.map((phrase) => (
+            <div key={phrase.label} className="flex items-center justify-between text-sm gap-2">
+              <span className="flex items-center gap-2">
+                {phrase.optimal && <Star className="w-3 h-3 text-yellow-500" />}
+                <span className={phrase.optimal ? 'font-medium' : ''}>{phrase.label}</span>
+              </span>
+              <span className={`tabular-nums font-medium ${
+                phrase.weight >= 20 ? 'text-green-600' : 
+                phrase.weight >= 10 ? 'text-primary' : 
+                'text-muted-foreground'
+              }`}>
+                +{phrase.weight}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
-      <p className="text-sm text-foreground">{coachMessage}</p>
+      <div className="text-sm font-medium">{message}</div>
     </section>
   );
 }
