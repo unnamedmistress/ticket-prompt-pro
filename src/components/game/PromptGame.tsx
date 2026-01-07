@@ -126,8 +126,8 @@ export function PromptGame() {
           </section>
 
           {/* Prompt Panel - Now below Available Phrases */}
-          <section className="rounded-xl border-2 border-dashed border-border bg-secondary/30 p-4">
-            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+          <section className="rounded-xl border-2 border-primary/40 bg-primary/5 p-4">
+            <div className="text-xs font-bold uppercase tracking-wider text-primary mb-2">
               Your Prompt:
             </div>
             <div className="flex flex-wrap items-start gap-2 min-h-[40px]">
@@ -152,7 +152,7 @@ export function PromptGame() {
             <Button
               onClick={handleTest}
               disabled={!canTest}
-              className="flex-1 gap-2 rounded-full shadow-button"
+              className="flex-1 gap-2 rounded-full shadow-button bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
               size="lg"
             >
               <Rocket className="w-4 h-4" />
