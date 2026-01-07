@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { Timer, RotateCcw, Rocket, Lightbulb } from 'lucide-react';
+import { Timer, RotateCcw, Rocket, Lightbulb, HelpCircle } from 'lucide-react';
 import { shufflePhrases } from '@/data/phrases';
 import { useGameTimer } from '@/hooks/useGameTimer';
 import { computeScore } from '@/utils/scoring';
@@ -11,10 +11,18 @@ import { GameResult, Phrase } from '@/types/game';
 
 const MAX_SELECTIONS = 4;
 
+const HINT_CATEGORIES = [
+  { name: 'Incident', description: 'Define what happened and what outcome you want' },
+  { name: 'Environment', description: 'Specify the system details (OS, permissions, security)' },
+  { name: 'Constraints', description: 'State limitations (no admin, preserve data, minimal downtime)' },
+  { name: 'Plan', description: 'Request a structured, safe action plan' },
+];
+
 export function PromptGame() {
   const [shuffledPhrases, setShuffledPhrases] = useState<Phrase[]>(() => shufflePhrases());
   const [selectedPhrases, setSelectedPhrases] = useState<Phrase[]>([]);
   const [result, setResult] = useState<GameResult | null>(null);
+  const [showHint, setShowHint] = useState(false);
   const { seconds, isRunning, start, stop, reset: resetTimer, formatTime } = useGameTimer();
 
   const togglePhrase = useCallback((phrase: Phrase) => {
@@ -41,6 +49,7 @@ export function PromptGame() {
     setSelectedPhrases([]);
     setResult(null);
     setShuffledPhrases(shufflePhrases());
+    setShowHint(false);
     resetTimer();
   }, [resetTimer]);
 
@@ -147,6 +156,15 @@ export function PromptGame() {
               Test Your Prompt
             </Button>
             <Button
+              variant="outline"
+              onClick={() => setShowHint(!showHint)}
+              className="gap-2 rounded-full"
+              size="lg"
+            >
+              <HelpCircle className="w-4 h-4" />
+              {showHint ? 'Hide Hint' : 'Show Hint'}
+            </Button>
+            <Button
               variant="secondary"
               onClick={handleReset}
               className="flex-1 gap-2 rounded-full"
@@ -156,6 +174,24 @@ export function PromptGame() {
               Reset & Shuffle
             </Button>
           </div>
+
+          {/* Hint Panel */}
+          {showHint && (
+            <div className="rounded-xl p-4 bg-[hsl(var(--warning-bg))] border border-[hsl(var(--warning-border))]">
+              <div className="flex items-center gap-2 mb-2">
+                <HelpCircle className="w-4 h-4 text-[hsl(var(--warning-foreground))]" />
+                <span className="font-semibold text-[hsl(var(--warning-foreground))]">Hint: The 4 Parts of a Great Prompt</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {HINT_CATEGORIES.map((cat) => (
+                  <div key={cat.name} className="bg-card/50 rounded-lg p-2 border border-border">
+                    <span className="font-medium text-sm">{cat.name}</span>
+                    <p className="text-xs text-muted-foreground">{cat.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Results */}
           {result && <ResultsPanel result={result} formatTime={formatTime} />}
