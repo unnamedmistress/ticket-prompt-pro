@@ -1,15 +1,18 @@
 import { useState, useCallback, useMemo } from 'react';
 import { Timer, RotateCcw, Rocket, Lightbulb } from 'lucide-react';
-import { phraseSections } from '@/data/phrases';
+import { phrases } from '@/data/phrases';
 import { useGameTimer } from '@/hooks/useGameTimer';
 import { computeScore } from '@/utils/scoring';
-import { PhraseSection } from './PhraseSection';
+import { PhraseChip } from './PhraseChip';
 import { PromptToken } from './PromptToken';
 import { ResultsPanel } from './ResultsPanel';
 import { Button } from '@/components/ui/button';
 import { GameResult, Phrase } from '@/types/game';
 
 const MAX_SELECTIONS = 4;
+
+// Shuffle phrases once on load for variety
+const shuffledPhrases = [...phrases].sort(() => Math.random() - 0.5);
 
 export function PromptGame() {
   const [selectedPhrases, setSelectedPhrases] = useState<Phrase[]>([]);
@@ -46,8 +49,7 @@ export function PromptGame() {
   
   const disabledIds = useMemo(() => {
     if (selectedPhrases.length < MAX_SELECTIONS) return new Set<string>();
-    const allIds = phraseSections.flatMap(s => s.phrases.map(p => p.label));
-    return new Set(allIds.filter(id => !selectedIds.has(id)));
+    return new Set(shuffledPhrases.map(p => p.label).filter(id => !selectedIds.has(id)));
   }, [selectedPhrases.length, selectedIds]);
 
   const canTest = selectedPhrases.length === MAX_SELECTIONS && !result;
@@ -62,7 +64,7 @@ export function PromptGame() {
               Build Your Prompt
             </h1>
             <p className="text-sm sm:text-base text-muted-foreground">
-              Craft the perfect IT ticket prompt by selecting one phrase from each category.
+              Craft the perfect IT ticket prompt by selecting the best phrases.
             </p>
             <div className="mt-3 p-3 rounded-xl bg-[hsl(var(--scenario-bg))] border border-[hsl(var(--scenario-border))] text-sm leading-relaxed">
               <strong>Scenario:</strong> User's Windows 11 laptop is very slow and crashes after an auto-update; fan is loud; large apps recently installed. Corporate build, BitLocker, standard user rights.
@@ -103,13 +105,13 @@ export function PromptGame() {
             </div>
           </section>
 
-          {/* Phrase Sections */}
-          <section className="rounded-xl border border-border bg-secondary/30 p-4 flex flex-col gap-4 max-h-[320px] sm:max-h-[380px] overflow-y-auto">
+          {/* All Phrases Mixed */}
+          <section className="rounded-xl border border-border bg-secondary/30 p-4 flex flex-col gap-3">
             <div className="flex items-baseline justify-between gap-2 flex-wrap">
               <div>
                 <h2 className="font-semibold text-foreground">Available Phrases</h2>
                 <p className="text-xs text-muted-foreground">
-                  Pick exactly four phrases total. Choose wisely — some phrases hurt your score!
+                  Pick exactly four phrases. Choose wisely — some phrases hurt your score!
                 </p>
               </div>
               <span className="text-xs text-muted-foreground">
@@ -117,17 +119,20 @@ export function PromptGame() {
               </span>
             </div>
             
-            {phraseSections.map((section) => (
-              <PhraseSection
-                key={section.section}
-                title={section.title}
-                description={section.description}
-                phrases={section.phrases}
-                selectedIds={selectedIds}
-                disabledIds={disabledIds}
-                onToggle={togglePhrase}
-              />
-            ))}
+            <div className="flex flex-wrap gap-2">
+              {shuffledPhrases.map((phrase) => {
+                const id = phrase.label;
+                return (
+                  <PhraseChip
+                    key={id}
+                    phrase={phrase}
+                    isSelected={selectedIds.has(id)}
+                    isDisabled={disabledIds.has(id)}
+                    onClick={() => togglePhrase(phrase)}
+                  />
+                );
+              })}
+            </div>
           </section>
 
           {/* Controls */}
