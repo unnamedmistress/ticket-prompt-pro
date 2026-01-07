@@ -13,4 +13,5 @@ export interface GameResult {
   optimalCount: number;
   elapsedSeconds: number;
   selectedPhrases: Phrase[];
+  timeBonus: number;
 }
