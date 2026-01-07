@@ -1,76 +1,32 @@
 import { Phrase, GameResult } from '@/types/game';
 
-const ESSENTIAL_CATEGORIES = ['incident', 'symptoms', 'environment', 'evidence', 'constraints', 'plan'];
+const MAX_SCORE = 100; // 4 optimal phrases × 25 points
 
 export function computeScore(selectedPhrases: Phrase[], timerSeconds: number): GameResult {
-  let relevantScore = 0;
-  let helpfulScore = 0;
-  let distractorScore = 0;
-  let relevantCount = 0;
-  let helpfulCount = 0;
-  let distractorCount = 0;
-
-  const categoriesPresent = new Set<string>();
-
-  selectedPhrases.forEach((phrase) => {
-    categoriesPresent.add(phrase.category);
-    if (phrase.type === 'relevant') {
-      relevantScore += phrase.weight;
-      relevantCount += 1;
-    } else if (phrase.type === 'helpful' || phrase.type === 'clarifying') {
-      helpfulScore += phrase.weight;
-      helpfulCount += 1;
-    } else if (phrase.type === 'distractor') {
-      distractorScore += phrase.weight;
-      distractorCount += 1;
-    }
-  });
-
-  let essentialsBonus = 0;
-  ESSENTIAL_CATEGORIES.forEach((cat) => {
-    if (selectedPhrases.some((p) => p.category === cat)) {
-      essentialsBonus += 3;
-    }
-  });
-
-  const diversityBonus = categoriesPresent.size >= 3 ? 2 : 0;
-
-  let timeBonus = 0;
-  if (relevantCount >= 3) {
-    const t = Math.min(timerSeconds, 240);
-    if (t <= 120) {
-      timeBonus = Math.round(10 * (1 - t / 120));
-    } else {
-      timeBonus = Math.round(-10 * ((t - 120) / 120));
-    }
-  }
-
-  const rawScore = relevantScore + helpfulScore + distractorScore + essentialsBonus + diversityBonus + timeBonus;
-  const finalXP = Math.max(0, Math.min(100, Math.round(rawScore)));
+  const totalScore = selectedPhrases.reduce((sum, p) => sum + p.weight, 0);
+  const optimalCount = selectedPhrases.filter(p => p.optimal).length;
+  const percentage = Math.round((totalScore / MAX_SCORE) * 100);
 
   return {
-    relevantScore,
-    helpfulScore,
-    distractorScore,
-    essentialsBonus,
-    diversityBonus,
-    timeBonus,
-    finalXP,
+    totalScore,
+    maxPossible: MAX_SCORE,
+    percentage,
+    optimalCount,
     elapsedSeconds: timerSeconds,
-    relevantCount,
-    helpfulCount,
-    distractorCount,
+    selectedPhrases,
   };
 }
 
-export function getCoachMessage(finalXP: number): string {
-  if (finalXP >= 90) {
-    return "Excellent—clear framing, evidence, constraints, and safe plan.";
-  } else if (finalXP >= 75) {
-    return "Strong craft; small refinements could boost clarity.";
-  } else if (finalXP >= 50) {
-    return "Decent—cover essentials and remove risky language.";
+export function getCoachMessage(result: GameResult): string {
+  if (result.optimalCount === 4) {
+    return "🏆 Perfect! You found the optimal prompt combination!";
+  } else if (result.percentage >= 90) {
+    return "Excellent! You're very close to the perfect prompt.";
+  } else if (result.percentage >= 75) {
+    return "Great job! Strong prompt with room for refinement.";
+  } else if (result.percentage >= 50) {
+    return "Good start. Try to identify the highest-impact phrases.";
   } else {
-    return "Needs work—replace distractors and include core elements.";
+    return "Keep practicing! Focus on incident, environment, constraints, and plan.";
   }
 }
