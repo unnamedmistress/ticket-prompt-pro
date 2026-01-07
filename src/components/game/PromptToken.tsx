@@ -8,8 +8,8 @@ interface PromptTokenProps {
 
 export function PromptToken({ phrase, onRemove }: PromptTokenProps) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-[hsl(var(--token-bg))] border border-[hsl(var(--token-border))] px-2.5 py-1 text-sm">
-      <span className="max-w-[45vw] truncate sm:max-w-[260px]">
+    <span className="inline-flex items-center gap-1 rounded-full bg-[hsl(var(--token-bg))] border border-[hsl(var(--token-border))] px-2 sm:px-2.5 py-0.5 sm:py-1 text-xs sm:text-sm">
+      <span className="max-w-[40vw] xs:max-w-[45vw] sm:max-w-[260px] truncate">
         {phrase.label}
       </span>
       <button
