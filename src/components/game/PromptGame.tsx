@@ -73,7 +73,7 @@ export function PromptGame() {
                 Build Your Prompt
               </h1>
               <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
-                Select 4 phrases to build the best IT ticket prompt.
+                Select 4 phrases to build the best prompt for solving this IT ticket.
               </p>
             </div>
             <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm flex-wrap">
