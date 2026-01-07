@@ -80,7 +80,7 @@ export function PromptGame() {
 
           {/* Scenario */}
           <div className="p-3 rounded-xl bg-[hsl(var(--scenario-bg))] border border-[hsl(var(--scenario-border))] text-sm leading-relaxed">
-            <strong>Scenario:</strong> User's Windows 11 laptop is very slow and crashes after an auto-update; fan is loud; large apps recently installed. Corporate build, BitLocker, standard user rights.
+            <strong>Scenario:</strong> Windows 11 laptop running slow with crashes after update. Fan loud, new apps installed. Corporate device, standard user.
           </div>
 
           {/* Prompt Panel */}
