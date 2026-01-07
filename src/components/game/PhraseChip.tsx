@@ -15,7 +15,7 @@ export function PhraseChip({ phrase, isSelected, isDisabled, onClick }: PhraseCh
       disabled={isDisabled}
       onClick={onClick}
       className={cn(
-        "rounded-full border px-3 py-1.5 text-sm transition-all duration-150",
+        "rounded-full border px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm transition-all duration-150",
         "hover:shadow-chip hover:-translate-y-0.5",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         "disabled:opacity-45 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-0",
