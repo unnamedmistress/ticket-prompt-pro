@@ -31,7 +31,7 @@ export function ResultsPanel({ result, formatTime }: ResultsPanelProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-4">
         <div className="bg-card rounded-lg p-3 text-center border border-border">
           <div className="text-2xl font-bold text-primary">{result.percentage}%</div>
           <div className="text-xs text-muted-foreground">Score</div>
@@ -49,8 +49,14 @@ export function ResultsPanel({ result, formatTime }: ResultsPanelProps) {
           <div className="text-xs text-muted-foreground">Time</div>
         </div>
         <div className="bg-card rounded-lg p-3 text-center border border-border">
-          <div className="text-2xl font-bold text-foreground">4</div>
-          <div className="text-xs text-muted-foreground">Max Optimal</div>
+          <div className={`text-2xl font-bold ${result.timeBonus > 0 ? 'text-green-600' : 'text-muted-foreground'}`}>
+            +{result.timeBonus}
+          </div>
+          <div className="text-xs text-muted-foreground">Speed Bonus</div>
+        </div>
+        <div className="bg-card rounded-lg p-3 text-center border border-border">
+          <div className="text-2xl font-bold text-foreground">120</div>
+          <div className="text-xs text-muted-foreground">Max Score</div>
         </div>
       </div>
 
