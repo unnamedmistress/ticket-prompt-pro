@@ -88,31 +88,12 @@ export function PromptGame() {
           </header>
 
           {/* Scenario */}
-          <div className="p-3 rounded-xl bg-[hsl(var(--scenario-bg))] border border-[hsl(var(--scenario-border))] text-sm leading-relaxed">
-            <strong>Scenario:</strong> Windows 11 laptop running slow with crashes after update. Fan loud, new apps installed. Corporate device, standard user.
+          <div className="p-5 sm:p-6 rounded-xl bg-[hsl(var(--scenario-bg))] border border-[hsl(var(--scenario-border))]">
+            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Scenario</div>
+            <p className="text-lg sm:text-xl leading-relaxed font-medium">
+              Windows 11 laptop running slow with crashes after update. Fan loud, new apps installed. Corporate device, standard user.
+            </p>
           </div>
-
-          {/* Prompt Panel */}
-          <section className="rounded-xl border-2 border-dashed border-border bg-secondary/30 p-4">
-            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-              Your Prompt:
-            </div>
-            <div className="flex flex-wrap items-start gap-2 min-h-[40px]">
-              {selectedPhrases.length === 0 ? (
-                <span className="text-sm text-muted-foreground">
-                  Select phrases below to construct your prompt.
-                </span>
-              ) : (
-                selectedPhrases.map((phrase) => (
-                  <PromptToken
-                    key={phrase.label}
-                    phrase={phrase}
-                    onRemove={() => togglePhrase(phrase)}
-                  />
-                ))
-              )}
-            </div>
-          </section>
 
           {/* All Phrases Mixed */}
           <section className="rounded-xl border border-border bg-secondary/30 p-4 flex flex-col gap-3">
@@ -141,6 +122,28 @@ export function PromptGame() {
                   />
                 );
               })}
+            </div>
+          </section>
+
+          {/* Prompt Panel - Now below Available Phrases */}
+          <section className="rounded-xl border-2 border-dashed border-border bg-secondary/30 p-4">
+            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+              Your Prompt:
+            </div>
+            <div className="flex flex-wrap items-start gap-2 min-h-[40px]">
+              {selectedPhrases.length === 0 ? (
+                <span className="text-sm text-muted-foreground">
+                  Select phrases above to construct your prompt.
+                </span>
+              ) : (
+                selectedPhrases.map((phrase) => (
+                  <PromptToken
+                    key={phrase.label}
+                    phrase={phrase}
+                    onRemove={() => togglePhrase(phrase)}
+                  />
+                ))
+              )}
             </div>
           </section>
 
