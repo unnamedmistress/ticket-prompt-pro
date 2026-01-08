@@ -12,10 +12,10 @@ import { GameResult, Phrase } from '@/types/game';
 const MAX_SELECTIONS = 4;
 
 const HINT_CATEGORIES = [
-  { name: 'Incident', description: 'Define what happened and what outcome you want' },
-  { name: 'Environment', description: 'Specify the system details (OS, permissions, security)' },
-  { name: 'Constraints', description: 'State limitations (no admin, preserve data, minimal downtime)' },
-  { name: 'Plan', description: 'Request a structured, safe action plan' },
+  { name: 'Goal', description: "Define what you're looking for and your objective" },
+  { name: 'Environment', description: 'Specify your Outlook version and platform' },
+  { name: 'Context', description: "Mention your account type and what you've tried" },
+  { name: 'Plan', description: 'Request step-by-step instructions to find the feature' },
 ];
 
 export function PromptGame() {
@@ -91,7 +91,7 @@ export function PromptGame() {
           <div className="p-3 sm:p-5 rounded-lg sm:rounded-xl bg-[hsl(var(--scenario-bg))] border border-[hsl(var(--scenario-border))]">
             <div className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 sm:mb-2">Scenario</div>
             <p className="text-sm sm:text-lg md:text-xl leading-relaxed font-medium">
-              Windows 11 laptop running slow with crashes after update. Fan loud, new apps installed. Corporate device, standard user.
+              A colleague mentioned a new "Scheduler" feature in Outlook, but you can't find it anywhere in your app.
             </p>
           </div>
 
@@ -207,7 +207,7 @@ export function PromptGame() {
             <div>
               <span className="font-bold text-xs sm:text-sm text-[hsl(var(--info-foreground))]">Pro Tip</span>
               <p className="text-xs sm:text-sm text-foreground mt-0.5">
-                Every phrase scores points, but only 4 are optimal. A perfect prompt covers: incident, environment, constraints, and plan.
+                Every phrase scores points, but only 4 are optimal. A perfect prompt covers: goal, environment, context, and plan.
               </p>
             </div>
           </aside>
