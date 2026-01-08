@@ -91,7 +91,7 @@ export function PromptGame() {
           <div className="p-3 sm:p-5 rounded-lg sm:rounded-xl bg-[hsl(var(--scenario-bg))] border border-[hsl(var(--scenario-border))]">
             <div className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 sm:mb-2">Scenario</div>
             <p className="text-sm sm:text-lg md:text-xl leading-relaxed font-medium">
-              A colleague mentioned a new "Scheduler" feature in Outlook, but you can't find it anywhere in your app.
+              A colleague mentioned a new "Scheduler" feature in Outlook that helps find meeting times everyone can attend, but you can't find it anywhere in your app.
             </p>
           </div>
 
