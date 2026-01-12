@@ -1,0 +1,554 @@
+// ==============================================================================
+// TICKET PROMPT PRO - Power Apps Canvas App
+// ==============================================================================
+// This file contains all the Power Fx formulas needed to recreate the 
+// Ticket Prompt Pro game in Power Apps Canvas App format.
+//
+// Instructions:
+// 1. Create a new Canvas App (Tablet or Phone layout)
+// 2. Follow the setup instructions for each section
+// 3. Copy formulas into the appropriate control properties
+// ==============================================================================
+
+// ==============================================================================
+// APP.ONSTART - Initialize Collections and Variables
+// ==============================================================================
+// Place this in App.OnStart property
+
+ClearCollect(
+    colPhrases,
+    // OPTIMAL ANSWERS (25 points each = 100 total)
+    {
+        ID: 1,
+        Label: "Describe what you want to do: schedule meetings with availability polling",
+        Weight: 25,
+        Category: "goal",
+        Type: "relevant",
+        Optimal: true
+    },
+    {
+        ID: 2,
+        Label: "State your Outlook version and platform (desktop, web, mobile)",
+        Weight: 25,
+        Category: "environment",
+        Type: "relevant",
+        Optimal: true
+    },
+    {
+        ID: 3,
+        Label: "Mention your account type (Microsoft 365, Exchange, personal)",
+        Weight: 25,
+        Category: "context",
+        Type: "relevant",
+        Optimal: true
+    },
+    {
+        ID: 4,
+        Label: "Ask how to find or enable this scheduling feature",
+        Weight: 25,
+        Category: "plan",
+        Type: "relevant",
+        Optimal: true
+    },
+    // GOOD ANSWERS (15-20 points)
+    {
+        ID: 5,
+        Label: "Ask if the feature requires admin permissions or a specific license",
+        Weight: 20,
+        Category: "permissions",
+        Type: "relevant",
+        Optimal: false
+    },
+    {
+        ID: 6,
+        Label: "Ask what the feature is officially called in Outlook",
+        Weight: 18,
+        Category: "goal",
+        Type: "relevant",
+        Optimal: false
+    },
+    {
+        ID: 7,
+        Label: "Ask if it's available in your region or being rolled out",
+        Weight: 18,
+        Category: "context",
+        Type: "relevant",
+        Optimal: false
+    },
+    {
+        ID: 8,
+        Label: "Mention where you've already looked (ribbon, settings, add-ins)",
+        Weight: 15,
+        Category: "troubleshooting",
+        Type: "relevant",
+        Optimal: false
+    },
+    {
+        ID: 9,
+        Label: "Ask if it's a built-in feature or an add-in to install",
+        Weight: 17,
+        Category: "context",
+        Type: "relevant",
+        Optimal: false
+    },
+    {
+        ID: 10,
+        Label: "Ask for a link to Microsoft's official instructions",
+        Weight: 15,
+        Category: "plan",
+        Type: "relevant",
+        Optimal: false
+    },
+    // DECENT ANSWERS (8-12 points)
+    {
+        ID: 11,
+        Label: "Mention you've searched the ribbon and calendar settings",
+        Weight: 12,
+        Category: "troubleshooting",
+        Type: "helpful",
+        Optimal: false
+    },
+    {
+        ID: 12,
+        Label: "Ask if your IT department needs to enable it",
+        Weight: 12,
+        Category: "permissions",
+        Type: "helpful",
+        Optimal: false
+    },
+    {
+        ID: 13,
+        Label: "Ask for a brief, focused answer",
+        Weight: 10,
+        Category: "style",
+        Type: "helpful",
+        Optimal: false
+    },
+    {
+        ID: 14,
+        Label: "Request step-by-step bullet points",
+        Weight: 10,
+        Category: "style",
+        Type: "helpful",
+        Optimal: false
+    },
+    {
+        ID: 15,
+        Label: "Ask the AI to clarify anything it needs first",
+        Weight: 10,
+        Category: "clarifying",
+        Type: "clarifying",
+        Optimal: false
+    },
+    {
+        ID: 16,
+        Label: "Ask about alternative ways to poll for meeting times",
+        Weight: 8,
+        Category: "plan",
+        Type: "helpful",
+        Optimal: false
+    },
+    {
+        ID: 17,
+        Label: "Ask if the feature has a different name in older versions",
+        Weight: 8,
+        Category: "context",
+        Type: "helpful",
+        Optimal: false
+    },
+    {
+        ID: 18,
+        Label: "Ask for keyboard shortcuts to access it faster",
+        Weight: 8,
+        Category: "style",
+        Type: "helpful",
+        Optimal: false
+    },
+    // WEAK ANSWERS (2-5 points)
+    {
+        ID: 19,
+        Label: "Explain exactly what your colleague said about it",
+        Weight: 3,
+        Category: "context",
+        Type: "weak",
+        Optimal: false
+    },
+    {
+        ID: 20,
+        Label: "Ask what version your colleague is using",
+        Weight: 3,
+        Category: "context",
+        Type: "weak",
+        Optimal: false
+    },
+    {
+        ID: 21,
+        Label: "Keep the tone casual and friendly",
+        Weight: 5,
+        Category: "style",
+        Type: "weak",
+        Optimal: false
+    },
+    {
+        ID: 22,
+        Label: "Mention you're frustrated you can't find it",
+        Weight: 4,
+        Category: "style",
+        Type: "weak",
+        Optimal: false
+    },
+    {
+        ID: 23,
+        Label: "Ask for screenshots showing where to click",
+        Weight: 5,
+        Category: "plan",
+        Type: "weak",
+        Optimal: false
+    },
+    {
+        ID: 24,
+        Label: "Say you've been searching for a long time",
+        Weight: 5,
+        Category: "context",
+        Type: "weak",
+        Optimal: false
+    },
+    {
+        ID: 25,
+        Label: "Ask whether Scheduler is new or old",
+        Weight: 4,
+        Category: "context",
+        Type: "weak",
+        Optimal: false
+    },
+    {
+        ID: 26,
+        Label: "Thank the AI before it responds",
+        Weight: 3,
+        Category: "style",
+        Type: "weak",
+        Optimal: false
+    },
+    {
+        ID: 27,
+        Label: "Try restarting Outlook before asking",
+        Weight: 2,
+        Category: "troubleshooting",
+        Type: "weak",
+        Optimal: false
+    },
+    {
+        ID: 28,
+        Label: "Ask if updating Outlook might help",
+        Weight: 2,
+        Category: "troubleshooting",
+        Type: "weak",
+        Optimal: false
+    },
+    {
+        ID: 29,
+        Label: "Ask if the feature works without internet",
+        Weight: 4,
+        Category: "clarifying",
+        Type: "weak",
+        Optimal: false
+    }
+);
+
+// Initialize shuffled phrases
+ClearCollect(
+    colShuffledPhrases,
+    Shuffle(colPhrases)
+);
+
+// Clear selected phrases
+Clear(colSelectedPhrases);
+
+// Initialize variables
+Set(varGameStarted, false);
+Set(varStartTime, Now());
+Set(varElapsedSeconds, 0);
+Set(varShowResults, false);
+Set(varShowHint, false);
+Set(varTotalScore, 0);
+Set(varOptimalCount, 0);
+Set(varTimeBonus, 0);
+Set(varMaxPossible, 120);
+Set(varPercentage, 0);
+Set(varCoachMessage, "");
+
+// Hint categories collection
+ClearCollect(
+    colHintCategories,
+    {Name: "Goal", Description: "Define what you're looking for and your objective"},
+    {Name: "Environment", Description: "Specify your Outlook version and platform"},
+    {Name: "Context", Description: "Mention your account type and what you've tried"},
+    {Name: "Plan", Description: "Request step-by-step instructions to find the feature"}
+);
+
+
+// ==============================================================================
+// TIMER CONTROL - OnTimerEnd Property
+// ==============================================================================
+// Add a Timer control with Duration: 1000 (1 second), Repeat: true, AutoStart: false
+// Name it: TimerGame
+// Set Start property: varGameStarted
+
+// Timer.OnTimerEnd:
+If(
+    varGameStarted,
+    Set(varElapsedSeconds, DateDiff(varStartTime, Now(), TimeUnit.Seconds))
+)
+
+
+// ==============================================================================
+// RESET BUTTON - OnSelect Property
+// ==============================================================================
+// Name: btnReset
+
+Clear(colSelectedPhrases);
+ClearCollect(colShuffledPhrases, Shuffle(colPhrases));
+Set(varGameStarted, false);
+Set(varStartTime, Now());
+Set(varElapsedSeconds, 0);
+Set(varShowResults, false);
+Set(varShowHint, false);
+Set(varTotalScore, 0);
+Set(varOptimalCount, 0);
+Set(varTimeBonus, 0);
+Set(varPercentage, 0);
+Set(varCoachMessage, "")
+
+
+// ==============================================================================
+// PHRASE GALLERY - OnSelect Property
+// ==============================================================================
+// Create a Gallery control named: galPhrases
+// Items: colShuffledPhrases
+// Template contains a Button or container
+
+// OnSelect for phrase item:
+If(
+    // Check if already selected
+    ThisItem.ID in colSelectedPhrases.ID,
+    // Remove it
+    Remove(colSelectedPhrases, LookUp(colSelectedPhrases, ID = ThisItem.ID)),
+    // Otherwise add if under limit
+    If(
+        CountRows(colSelectedPhrases) < 4,
+        Collect(colSelectedPhrases, ThisItem);
+        // Start timer on first selection
+        If(
+            Not(varGameStarted),
+            Set(varGameStarted, true);
+            Set(varStartTime, Now())
+        )
+    )
+)
+
+
+// ==============================================================================
+// PHRASE BUTTON FILL COLOR - Using conditional formatting
+// ==============================================================================
+// For the phrase button/container Fill property:
+
+If(
+    ThisItem.ID in colSelectedPhrases.ID,
+    RGBA(59, 130, 246, 0.2),  // Selected - blue tint
+    RGBA(248, 250, 252, 1)    // Default - light gray
+)
+
+// For BorderColor:
+If(
+    ThisItem.ID in colSelectedPhrases.ID,
+    RGBA(59, 130, 246, 1),    // Selected - blue border
+    RGBA(226, 232, 240, 1)    // Default - gray border
+)
+
+
+// ==============================================================================
+// PHRASE BUTTON DISPLAYMODE - Disable when max reached
+// ==============================================================================
+
+If(
+    CountRows(colSelectedPhrases) >= 4 And Not(ThisItem.ID in colSelectedPhrases.ID),
+    DisplayMode.Disabled,
+    DisplayMode.Edit
+)
+
+
+// ==============================================================================
+// TEST BUTTON - OnSelect Property (Scoring Logic)
+// ==============================================================================
+// Name: btnTestPrompt
+
+If(
+    CountRows(colSelectedPhrases) = 4 And Not(varShowResults),
+    
+    // Stop the timer
+    Set(varGameStarted, false);
+    
+    // Calculate base score
+    Set(varBaseScore, Sum(colSelectedPhrases, Weight));
+    
+    // Count optimal phrases
+    Set(varOptimalCount, CountIf(colSelectedPhrases, Optimal = true));
+    
+    // Calculate time bonus
+    Set(
+        varTimeBonus,
+        If(
+            varElapsedSeconds <= 15,
+            20,
+            If(
+                varElapsedSeconds < 60,
+                Round(20 * (1 - (varElapsedSeconds - 15) / 45), 0),
+                0
+            )
+        )
+    );
+    
+    // Calculate total score
+    Set(varTotalScore, varBaseScore + varTimeBonus);
+    
+    // Calculate percentage
+    Set(varPercentage, Round((varTotalScore / varMaxPossible) * 100, 0));
+    
+    // Set coach message
+    Set(
+        varCoachMessage,
+        If(
+            varOptimalCount = 4,
+            "Perfect! You found the optimal prompt combination!",
+            If(
+                varPercentage >= 90,
+                "Excellent! You're very close to the perfect prompt.",
+                If(
+                    varPercentage >= 75,
+                    "Great job! Strong prompt with room for refinement.",
+                    If(
+                        varPercentage >= 50,
+                        "Good start. Try to identify the highest-impact phrases.",
+                        "Keep practicing! Focus on goal, environment, context, and plan."
+                    )
+                )
+            )
+        )
+    );
+    
+    // Show results
+    Set(varShowResults, true)
+)
+
+
+// ==============================================================================
+// TEST BUTTON - DisplayMode Property
+// ==============================================================================
+
+If(
+    CountRows(colSelectedPhrases) = 4 And Not(varShowResults),
+    DisplayMode.Edit,
+    DisplayMode.Disabled
+)
+
+
+// ==============================================================================
+// HINT BUTTON - OnSelect Property
+// ==============================================================================
+// Name: btnHint
+
+Set(varShowHint, Not(varShowHint))
+
+
+// ==============================================================================
+// TIMER DISPLAY - Text Property
+// ==============================================================================
+// Name: lblTimer
+
+Text(
+    Time(0, 0, varElapsedSeconds),
+    "mm:ss"
+)
+
+
+// ==============================================================================
+// SELECTION COUNTER - Text Property
+// ==============================================================================
+// Name: lblSelectionCount
+
+CountRows(colSelectedPhrases) & "/4 selected"
+
+
+// ==============================================================================
+// SELECTED PHRASES GALLERY - Items Property
+// ==============================================================================
+// Name: galSelectedPhrases
+
+colSelectedPhrases
+
+
+// ==============================================================================
+// RESULTS PANEL VISIBILITY
+// ==============================================================================
+
+varShowResults
+
+
+// ==============================================================================
+// HINT PANEL VISIBILITY
+// ==============================================================================
+
+varShowHint
+
+
+// ==============================================================================
+// MISSED OPTIMAL PHRASES (for Results Panel)
+// ==============================================================================
+// Create a collection to show missed optimal phrases
+// Add to btnTestPrompt OnSelect after calculating results:
+
+ClearCollect(
+    colMissedOptimal,
+    Filter(
+        colPhrases,
+        Optimal = true And Not(ID in colSelectedPhrases.ID)
+    )
+)
+
+
+// ==============================================================================
+// RESULTS GALLERY - Items (for showing user selections with scores)
+// ==============================================================================
+// Name: galResults
+
+colSelectedPhrases
+
+
+// ==============================================================================
+// SCORE LABEL COLORS (in results gallery)
+// ==============================================================================
+
+If(
+    ThisItem.Weight >= 20,
+    RGBA(22, 163, 74, 1),    // Green for high scores
+    If(
+        ThisItem.Weight >= 10,
+        RGBA(59, 130, 246, 1), // Blue for medium
+        RGBA(107, 114, 128, 1) // Gray for low
+    )
+)
+
+
+// ==============================================================================
+// OPTIMAL STAR VISIBILITY (in results gallery)
+// ==============================================================================
+
+ThisItem.Optimal
+
+
+// ==============================================================================
+// HINT GALLERY - Items
+// ==============================================================================
+// Name: galHints
+
+colHintCategories

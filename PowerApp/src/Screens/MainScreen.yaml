@@ -1,0 +1,763 @@
+MainScreen As screen:
+    Fill: =RGBA(248, 250, 252, 1)
+    
+    # ===========================================================================
+    # TIMER CONTROL (Hidden - runs in background)
+    # ===========================================================================
+    TimerGame As timer:
+        Duration: =1000
+        Repeat: =true
+        AutoStart: =false
+        Start: =varGameStarted
+        OnTimerEnd: =If(varGameStarted, Set(varElapsedSeconds, DateDiff(varStartTime, Now(), TimeUnit.Seconds)))
+        Visible: =false
+    
+    # ===========================================================================
+    # MAIN CONTAINER
+    # ===========================================================================
+    conMain As container:
+        X: =20
+        Y: =20
+        Width: =Parent.Width - 40
+        Height: =Parent.Height - 40
+        Fill: =RGBA(255, 255, 255, 1)
+        BorderRadius: =16
+        DropShadow: =DropShadow.Light
+        PaddingTop: =24
+        PaddingBottom: =24
+        PaddingLeft: =24
+        PaddingRight: =24
+        LayoutMode: =LayoutMode.Auto
+        LayoutDirection: =LayoutDirection.Vertical
+        LayoutGap: =16
+        
+        # -----------------------------------------------------------------------
+        # HEADER SECTION
+        # -----------------------------------------------------------------------
+        conHeader As container:
+            Width: =Parent.Width - 48
+            Height: =80
+            LayoutMode: =LayoutMode.Auto
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutGap: =8
+            
+            lblTitle As label:
+                Text: ="Build Your Prompt"
+                Width: =Parent.Width
+                Height: =36
+                Size: =24
+                FontWeight: =FontWeight.Bold
+                Color: =RGBA(15, 23, 42, 1)
+            
+            lblSubtitle As label:
+                Text: ="Select 4 phrases to build the best prompt for solving this IT ticket."
+                Width: =Parent.Width
+                Height: =24
+                Size: =14
+                Color: =RGBA(100, 116, 139, 1)
+            
+            conStats As container:
+                Width: =Parent.Width
+                Height: =32
+                LayoutMode: =LayoutMode.Auto
+                LayoutDirection: =LayoutDirection.Horizontal
+                LayoutGap: =16
+                
+                conTimer As container:
+                    Width: =100
+                    Height: =28
+                    Fill: =RGBA(239, 246, 255, 1)
+                    BorderRadius: =14
+                    
+                    lblTimerIcon As label:
+                        X: =8
+                        Y: =4
+                        Width: =20
+                        Height: =20
+                        Text: ="&#x23F1;"
+                        Size: =14
+                        
+                    lblTimer As label:
+                        X: =30
+                        Y: =4
+                        Width: =60
+                        Height: =20
+                        Text: =Text(Time(0, 0, varElapsedSeconds), "mm:ss")
+                        Size: =14
+                        FontWeight: =FontWeight.Semibold
+                        Color: =RGBA(59, 130, 246, 1)
+                
+                conSelectionCount As container:
+                    Width: =120
+                    Height: =28
+                    Fill: =RGBA(241, 245, 249, 1)
+                    BorderRadius: =14
+                    
+                    lblSelectionCount As label:
+                        X: =12
+                        Y: =4
+                        Width: =96
+                        Height: =20
+                        Text: =CountRows(colSelectedPhrases) & "/4 selected"
+                        Size: =14
+                        FontWeight: =FontWeight.Medium
+        
+                # -----------------------------------------------------------------------
+                # SCENARIO SECTION
+                # -----------------------------------------------------------------------
+        conScenario As container:
+            Width: =Parent.Width - 48
+            Height: =100
+            Fill: =RGBA(254, 252, 232, 1)
+            BorderRadius: =12
+            BorderColor: =RGBA(253, 224, 71, 1)
+            BorderThickness: =1
+            PaddingTop: =16
+            PaddingBottom: =16
+            PaddingLeft: =20
+            PaddingRight: =20
+            
+            lblScenarioLabel As label:
+                X: =0
+                Y: =0
+                Width: =Parent.Width - 40
+                Height: =18
+                Text: ="SCENARIO"
+                Size: =10
+                FontWeight: =FontWeight.Bold
+                Color: =RGBA(100, 116, 139, 1)
+            
+            lblScenarioText As label:
+                X: =0
+                Y: =22
+                Width: =Parent.Width - 40
+                Height: =60
+                Text: ="A colleague mentioned a new ""Scheduler"" feature in Outlook that helps find meeting times everyone can attend, but you can't find it anywhere in your app."
+                Size: =16
+                FontWeight: =FontWeight.Medium
+                Color: =RGBA(15, 23, 42, 1)
+        
+        # -----------------------------------------------------------------------
+        # AVAILABLE PHRASES SECTION
+        # -----------------------------------------------------------------------
+        conPhrases As container:
+            Width: =Parent.Width - 48
+            Height: =If(varShowResults, 200, 320)
+            Fill: =RGBA(248, 250, 252, 1)
+            BorderRadius: =12
+            BorderColor: =RGBA(226, 232, 240, 1)
+            BorderThickness: =1
+            PaddingTop: =16
+            PaddingBottom: =16
+            PaddingLeft: =16
+            PaddingRight: =16
+            
+            lblPhrasesTitle As label:
+                X: =0
+                Y: =0
+                Width: =200
+                Height: =24
+                Text: ="Available Phrases"
+                Size: =14
+                FontWeight: =FontWeight.Semibold
+                Color: =RGBA(15, 23, 42, 1)
+            
+            lblPhrasesSubtitle As label:
+                X: =0
+                Y: =24
+                Width: =300
+                Height: =18
+                Text: ="Find the 4 optimal phrases for a perfect 100!"
+                Size: =12
+                Color: =RGBA(100, 116, 139, 1)
+            
+            lblTapToSelect As label:
+                X: =Parent.Width - 120
+                Y: =0
+                Width: =100
+                Height: =20
+                Text: ="Tap to select"
+                Size: =11
+                Color: =RGBA(100, 116, 139, 1)
+                Align: =Align.Right
+            
+            galPhrases As gallery.galleryHorizontal:
+                X: =0
+                Y: =50
+                Width: =Parent.Width - 32
+                Height: =Parent.Height - 66
+                Items: =colShuffledPhrases
+                WrapCount: =4
+                TemplateSize: =If(Parent.Width > 800, Parent.Width / 4 - 12, Parent.Width / 2 - 12)
+                TemplatePadding: =4
+                
+                btnPhrase As button:
+                    X: =4
+                    Y: =4
+                    Width: =Parent.TemplateWidth - 16
+                    Height: =50
+                    Text: =ThisItem.Label
+                    Size: =11
+                    BorderRadius: =20
+                    Fill: =If(ThisItem.ID in colSelectedPhrases.ID, RGBA(219, 234, 254, 1), RGBA(255, 255, 255, 1))
+                    BorderColor: =If(ThisItem.ID in colSelectedPhrases.ID, RGBA(59, 130, 246, 1), RGBA(226, 232, 240, 1))
+                    BorderThickness: =If(ThisItem.ID in colSelectedPhrases.ID, 2, 1)
+                    Color: =If(ThisItem.ID in colSelectedPhrases.ID, RGBA(37, 99, 235, 1), RGBA(15, 23, 42, 1))
+                    HoverFill: =RGBA(241, 245, 249, 1)
+                    PressedFill: =RGBA(226, 232, 240, 1)
+                    DisplayMode: =If(CountRows(colSelectedPhrases) >= 4 And Not(ThisItem.ID in colSelectedPhrases.ID), DisplayMode.Disabled, DisplayMode.Edit)
+                    OnSelect: |
+                        =If(
+                            ThisItem.ID in colSelectedPhrases.ID,
+                            Remove(colSelectedPhrases, LookUp(colSelectedPhrases, ID = ThisItem.ID)),
+                            If(
+                                CountRows(colSelectedPhrases) < 4,
+                                Collect(colSelectedPhrases, ThisItem);
+                                If(Not(varGameStarted), Set(varGameStarted, true); Set(varStartTime, Now()))
+                            )
+                        )
+        
+        # -----------------------------------------------------------------------
+        # YOUR PROMPT SECTION
+        # -----------------------------------------------------------------------
+        conYourPrompt As container:
+            Width: =Parent.Width - 48
+            Height: =80
+            Fill: =RGBA(239, 246, 255, 1)
+            BorderRadius: =12
+            BorderColor: =RGBA(147, 197, 253, 1)
+            BorderThickness: =2
+            PaddingTop: =12
+            PaddingBottom: =12
+            PaddingLeft: =16
+            PaddingRight: =16
+            
+            lblYourPromptLabel As label:
+                X: =0
+                Y: =0
+                Width: =100
+                Height: =18
+                Text: ="YOUR PROMPT:"
+                Size: =10
+                FontWeight: =FontWeight.Bold
+                Color: =RGBA(59, 130, 246, 1)
+            
+            galSelectedPhrases As gallery.galleryHorizontal:
+                X: =0
+                Y: =22
+                Width: =Parent.Width - 32
+                Height: =40
+                Items: =colSelectedPhrases
+                TemplateSize: =240
+                TemplatePadding: =4
+                Visible: =CountRows(colSelectedPhrases) > 0
+                
+                conSelectedPhrase As container:
+                    Width: =230
+                    Height: =32
+                    Fill: =RGBA(219, 234, 254, 1)
+                    BorderRadius: =16
+                    BorderColor: =RGBA(147, 197, 253, 1)
+                    BorderThickness: =1
+                    
+                    lblSelectedText As label:
+                        X: =12
+                        Y: =6
+                        Width: =180
+                        Height: =20
+                        Text: =Left(ThisItem.Label, 30) & If(Len(ThisItem.Label) > 30, "...", "")
+                        Size: =11
+                        Color: =RGBA(30, 64, 175, 1)
+                    
+                    btnRemovePhrase As button:
+                        X: =Parent.Width - 28
+                        Y: =4
+                        Width: =24
+                        Height: =24
+                        Text: ="X"
+                        Size: =10
+                        BorderRadius: =12
+                        Fill: =RGBA(239, 68, 68, 0.1)
+                        Color: =RGBA(239, 68, 68, 1)
+                        OnSelect: =Remove(colSelectedPhrases, ThisItem)
+            
+            lblEmptyPrompt As label:
+                X: =0
+                Y: =22
+                Width: =Parent.Width - 32
+                Height: =40
+                Text: ="Select phrases above to construct your prompt."
+                Size: =13
+                Color: =RGBA(100, 116, 139, 1)
+                Visible: =CountRows(colSelectedPhrases) = 0
+        
+        # -----------------------------------------------------------------------
+        # CONTROL BUTTONS
+        # -----------------------------------------------------------------------
+        conControls As container:
+            Width: =Parent.Width - 48
+            Height: =100
+            LayoutMode: =LayoutMode.Auto
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutGap: =12
+            
+            conButtonRow As container:
+                Width: =Parent.Width
+                Height: =40
+                LayoutMode: =LayoutMode.Auto
+                LayoutDirection: =LayoutDirection.Horizontal
+                LayoutGap: =12
+                
+                btnReset As button:
+                    Width: =(Parent.Width - 12) / 2
+                    Height: =40
+                    Text: ="Reset"
+                    Size: =14
+                    BorderRadius: =20
+                    Fill: =RGBA(241, 245, 249, 1)
+                    Color: =RGBA(71, 85, 105, 1)
+                    BorderColor: =RGBA(226, 232, 240, 1)
+                    BorderThickness: =1
+                    OnSelect: |
+                        =Clear(colSelectedPhrases);
+                        ClearCollect(colShuffledPhrases, Shuffle(colPhrases));
+                        Set(varGameStarted, false);
+                        Set(varStartTime, Now());
+                        Set(varElapsedSeconds, 0);
+                        Set(varShowResults, false);
+                        Set(varShowHint, false);
+                        Set(varTotalScore, 0);
+                        Set(varOptimalCount, 0);
+                        Set(varTimeBonus, 0);
+                        Set(varPercentage, 0);
+                        Set(varCoachMessage, "");
+                        Clear(colMissedOptimal)
+                
+                btnHint As button:
+                    Width: =(Parent.Width - 12) / 2
+                    Height: =40
+                    Text: =If(varShowHint, "Hide Hint", "Show Hint")
+                    Size: =14
+                    BorderRadius: =20
+                    Fill: =RGBA(255, 255, 255, 1)
+                    Color: =RGBA(71, 85, 105, 1)
+                    BorderColor: =RGBA(226, 232, 240, 1)
+                    BorderThickness: =1
+                    OnSelect: =Set(varShowHint, Not(varShowHint))
+            
+            btnTestPrompt As button:
+                Width: =Parent.Width
+                Height: =48
+                Text: ="Test Your Prompt"
+                Size: =16
+                FontWeight: =FontWeight.Semibold
+                BorderRadius: =24
+                Fill: =If(CountRows(colSelectedPhrases) = 4 And Not(varShowResults), RGBA(59, 130, 246, 1), RGBA(148, 163, 184, 1))
+                Color: =RGBA(255, 255, 255, 1)
+                DisplayMode: =If(CountRows(colSelectedPhrases) = 4 And Not(varShowResults), DisplayMode.Edit, DisplayMode.Disabled)
+                OnSelect: |
+                    =Set(varGameStarted, false);
+                    Set(varBaseScore, Sum(colSelectedPhrases, Weight));
+                    Set(varOptimalCount, CountIf(colSelectedPhrases, Optimal = true));
+                    Set(varTimeBonus, If(varElapsedSeconds <= 15, 20, If(varElapsedSeconds < 60, Round(20 * (1 - (varElapsedSeconds - 15) / 45), 0), 0)));
+                    Set(varTotalScore, varBaseScore + varTimeBonus);
+                    Set(varPercentage, Round((varTotalScore / varMaxPossible) * 100, 0));
+                    Set(varCoachMessage, If(varOptimalCount = 4, "Perfect! You found the optimal prompt combination!", If(varPercentage >= 90, "Excellent! You're very close to the perfect prompt.", If(varPercentage >= 75, "Great job! Strong prompt with room for refinement.", If(varPercentage >= 50, "Good start. Try to identify the highest-impact phrases.", "Keep practicing! Focus on goal, environment, context, and plan.")))));
+                    ClearCollect(colMissedOptimal, Filter(colPhrases, Optimal = true And Not(ID in colSelectedPhrases.ID)));
+                    Set(varShowResults, true)
+        
+        # -----------------------------------------------------------------------
+        # HINT PANEL (Conditional)
+        # -----------------------------------------------------------------------
+        conHintPanel As container:
+            Width: =Parent.Width - 48
+            Height: =140
+            Fill: =RGBA(254, 243, 199, 1)
+            BorderRadius: =12
+            BorderColor: =RGBA(252, 211, 77, 1)
+            BorderThickness: =1
+            Visible: =varShowHint
+            PaddingTop: =16
+            PaddingBottom: =16
+            PaddingLeft: =16
+            PaddingRight: =16
+            
+            lblHintTitle As label:
+                X: =0
+                Y: =0
+                Width: =300
+                Height: =24
+                Text: ="The 4 Parts of a Great Prompt"
+                Size: =14
+                FontWeight: =FontWeight.Semibold
+                Color: =RGBA(146, 64, 14, 1)
+            
+            galHints As gallery.galleryHorizontal:
+                X: =0
+                Y: =30
+                Width: =Parent.Width - 32
+                Height: =90
+                Items: =colHintCategories
+                TemplateSize: =(Parent.Width - 32) / 4
+                TemplatePadding: =4
+                
+                conHintItem As container:
+                    Width: =Parent.TemplateWidth - 8
+                    Height: =80
+                    Fill: =RGBA(255, 255, 255, 0.7)
+                    BorderRadius: =8
+                    BorderColor: =RGBA(226, 232, 240, 1)
+                    BorderThickness: =1
+                    PaddingTop: =8
+                    PaddingBottom: =8
+                    PaddingLeft: =8
+                    PaddingRight: =8
+                    
+                    lblHintName As label:
+                        X: =0
+                        Y: =0
+                        Width: =Parent.Width - 16
+                        Height: =20
+                        Text: =ThisItem.Name
+                        Size: =13
+                        FontWeight: =FontWeight.Medium
+                    
+                    lblHintDesc As label:
+                        X: =0
+                        Y: =22
+                        Width: =Parent.Width - 16
+                        Height: =40
+                        Text: =ThisItem.Description
+                        Size: =11
+                        Color: =RGBA(100, 116, 139, 1)
+        
+        # -----------------------------------------------------------------------
+        # RESULTS PANEL (Conditional)
+        # -----------------------------------------------------------------------
+        conResultsPanel As container:
+            Width: =Parent.Width - 48
+            Height: =340
+            Fill: =RGBA(248, 250, 252, 1)
+            BorderRadius: =12
+            BorderColor: =RGBA(226, 232, 240, 1)
+            BorderThickness: =1
+            Visible: =varShowResults
+            PaddingTop: =16
+            PaddingBottom: =16
+            PaddingLeft: =16
+            PaddingRight: =16
+            
+            conResultsHeader As container:
+                X: =0
+                Y: =0
+                Width: =Parent.Width - 32
+                Height: =40
+                
+                lblResultsTitle As label:
+                    X: =0
+                    Y: =8
+                    Width: =100
+                    Height: =24
+                    Text: =If(varOptimalCount = 4, "Results", "Results")
+                    Size: =16
+                    FontWeight: =FontWeight.Semibold
+                
+                conScoreBadge As container:
+                    X: =Parent.Width - 140
+                    Y: =0
+                    Width: =140
+                    Height: =36
+                    Fill: =If(varOptimalCount = 4, RGBA(254, 249, 195, 1), RGBA(220, 252, 231, 1))
+                    BorderRadius: =18
+                    BorderColor: =If(varOptimalCount = 4, RGBA(253, 224, 71, 1), RGBA(134, 239, 172, 1))
+                    BorderThickness: =1
+                    
+                    lblScoreBadge As label:
+                        X: =16
+                        Y: =8
+                        Width: =108
+                        Height: =20
+                        Text: =varTotalScore & " / " & varMaxPossible & " pts"
+                        Size: =14
+                        FontWeight: =FontWeight.Bold
+                        Color: =If(varOptimalCount = 4, RGBA(161, 98, 7, 1), RGBA(22, 163, 74, 1))
+                        Align: =Align.Center
+            
+            conStatsRow As container:
+                X: =0
+                Y: =50
+                Width: =Parent.Width - 32
+                Height: =70
+                LayoutMode: =LayoutMode.Auto
+                LayoutDirection: =LayoutDirection.Horizontal
+                LayoutGap: =8
+                
+                conStatScore As container:
+                    Width: =(Parent.Width - 24) / 4
+                    Height: =60
+                    Fill: =RGBA(255, 255, 255, 1)
+                    BorderRadius: =8
+                    BorderColor: =RGBA(226, 232, 240, 1)
+                    BorderThickness: =1
+                    
+                    lblStatScoreValue As label:
+                        X: =0
+                        Y: =10
+                        Width: =Parent.Width
+                        Height: =24
+                        Text: =varPercentage & "%"
+                        Size: =20
+                        FontWeight: =FontWeight.Bold
+                        Color: =RGBA(59, 130, 246, 1)
+                        Align: =Align.Center
+                    
+                    lblStatScoreLabel As label:
+                        X: =0
+                        Y: =36
+                        Width: =Parent.Width
+                        Height: =18
+                        Text: ="Score"
+                        Size: =11
+                        Color: =RGBA(100, 116, 139, 1)
+                        Align: =Align.Center
+                
+                conStatOptimal As container:
+                    Width: =(Parent.Width - 24) / 4
+                    Height: =60
+                    Fill: =RGBA(255, 255, 255, 1)
+                    BorderRadius: =8
+                    BorderColor: =RGBA(226, 232, 240, 1)
+                    BorderThickness: =1
+                    
+                    lblStatOptimalValue As label:
+                        X: =0
+                        Y: =10
+                        Width: =Parent.Width
+                        Height: =24
+                        Text: =varOptimalCount & " *"
+                        Size: =20
+                        FontWeight: =FontWeight.Bold
+                        Align: =Align.Center
+                    
+                    lblStatOptimalLabel As label:
+                        X: =0
+                        Y: =36
+                        Width: =Parent.Width
+                        Height: =18
+                        Text: ="Optimal"
+                        Size: =11
+                        Color: =RGBA(100, 116, 139, 1)
+                        Align: =Align.Center
+                
+                conStatTime As container:
+                    Width: =(Parent.Width - 24) / 4
+                    Height: =60
+                    Fill: =RGBA(255, 255, 255, 1)
+                    BorderRadius: =8
+                    BorderColor: =RGBA(226, 232, 240, 1)
+                    BorderThickness: =1
+                    
+                    lblStatTimeValue As label:
+                        X: =0
+                        Y: =10
+                        Width: =Parent.Width
+                        Height: =24
+                        Text: =Text(Time(0, 0, varElapsedSeconds), "mm:ss")
+                        Size: =20
+                        FontWeight: =FontWeight.Bold
+                        Align: =Align.Center
+                    
+                    lblStatTimeLabel As label:
+                        X: =0
+                        Y: =36
+                        Width: =Parent.Width
+                        Height: =18
+                        Text: ="Time"
+                        Size: =11
+                        Color: =RGBA(100, 116, 139, 1)
+                        Align: =Align.Center
+                
+                conStatBonus As container:
+                    Width: =(Parent.Width - 24) / 4
+                    Height: =60
+                    Fill: =RGBA(255, 255, 255, 1)
+                    BorderRadius: =8
+                    BorderColor: =RGBA(226, 232, 240, 1)
+                    BorderThickness: =1
+                    
+                    lblStatBonusValue As label:
+                        X: =0
+                        Y: =10
+                        Width: =Parent.Width
+                        Height: =24
+                        Text: ="+" & varTimeBonus
+                        Size: =20
+                        FontWeight: =FontWeight.Bold
+                        Color: =If(varTimeBonus > 0, RGBA(22, 163, 74, 1), RGBA(100, 116, 139, 1))
+                        Align: =Align.Center
+                    
+                    lblStatBonusLabel As label:
+                        X: =0
+                        Y: =36
+                        Width: =Parent.Width
+                        Height: =18
+                        Text: ="Speed"
+                        Size: =11
+                        Color: =RGBA(100, 116, 139, 1)
+                        Align: =Align.Center
+            
+            conYourSelections As container:
+                X: =0
+                Y: =130
+                Width: =Parent.Width - 32
+                Height: =100
+                Fill: =RGBA(255, 255, 255, 1)
+                BorderRadius: =8
+                BorderColor: =RGBA(226, 232, 240, 1)
+                BorderThickness: =1
+                PaddingTop: =8
+                PaddingBottom: =8
+                PaddingLeft: =12
+                PaddingRight: =12
+                
+                lblSelectionsTitle As label:
+                    X: =0
+                    Y: =0
+                    Width: =150
+                    Height: =20
+                    Text: ="Your Selections:"
+                    Size: =13
+                    FontWeight: =FontWeight.Medium
+                
+                galResultsSelections As gallery.galleryVertical:
+                    X: =0
+                    Y: =24
+                    Width: =Parent.Width - 24
+                    Height: =70
+                    Items: =colSelectedPhrases
+                    TemplateSize: =18
+                    TemplatePadding: =0
+                    
+                    lblResultPhrase As label:
+                        X: =If(ThisItem.Optimal, 18, 0)
+                        Y: =0
+                        Width: =Parent.TemplateWidth - 60
+                        Height: =16
+                        Text: =ThisItem.Label
+                        Size: =11
+                        FontWeight: =If(ThisItem.Optimal, FontWeight.Medium, FontWeight.Normal)
+                    
+                    lblResultStar As label:
+                        X: =0
+                        Y: =0
+                        Width: =16
+                        Height: =16
+                        Text: ="*"
+                        Size: =12
+                        Color: =RGBA(234, 179, 8, 1)
+                        Visible: =ThisItem.Optimal
+                    
+                    lblResultScore As label:
+                        X: =Parent.TemplateWidth - 40
+                        Y: =0
+                        Width: =40
+                        Height: =16
+                        Text: ="+" & ThisItem.Weight
+                        Size: =11
+                        FontWeight: =FontWeight.Medium
+                        Align: =Align.Right
+                        Color: =If(ThisItem.Weight >= 20, RGBA(22, 163, 74, 1), If(ThisItem.Weight >= 10, RGBA(59, 130, 246, 1), RGBA(100, 116, 139, 1)))
+            
+            lblCoachMessage As label:
+                X: =0
+                Y: =240
+                Width: =Parent.Width - 32
+                Height: =24
+                Text: =varCoachMessage
+                Size: =13
+                FontWeight: =FontWeight.Medium
+            
+            conMissedOptimal As container:
+                X: =0
+                Y: =270
+                Width: =Parent.Width - 32
+                Height: =60
+                Fill: =RGBA(239, 246, 255, 1)
+                BorderRadius: =8
+                BorderColor: =RGBA(191, 219, 254, 1)
+                BorderThickness: =1
+                Visible: =CountRows(colMissedOptimal) > 0
+                PaddingTop: =8
+                PaddingBottom: =8
+                PaddingLeft: =12
+                PaddingRight: =12
+                
+                lblMissedTitle As label:
+                    X: =0
+                    Y: =0
+                    Width: =200
+                    Height: =18
+                    Text: ="Next Time, Consider:"
+                    Size: =12
+                    FontWeight: =FontWeight.Semibold
+                    Color: =RGBA(30, 64, 175, 1)
+                
+                galMissedOptimal As gallery.galleryVertical:
+                    X: =0
+                    Y: =22
+                    Width: =Parent.Width - 24
+                    Height: =30
+                    Items: =colMissedOptimal
+                    TemplateSize: =16
+                    TemplatePadding: =0
+                    
+                    lblMissedPhrase As label:
+                        X: =18
+                        Y: =0
+                        Width: =Parent.TemplateWidth - 18
+                        Height: =14
+                        Text: '=Upper(Left(ThisItem.Category, 1)) & Mid(ThisItem.Category, 2) & ": " & ThisItem.Label'
+                        Size: =10
+                    
+                    lblMissedStar As label:
+                        X: =0
+                        Y: =0
+                        Width: =16
+                        Height: =14
+                        Text: ="*"
+                        Size: =11
+                        Color: =RGBA(234, 179, 8, 1)
+        
+        # -----------------------------------------------------------------------
+        # PRO TIP SECTION
+        # -----------------------------------------------------------------------
+        conProTip As container:
+            Width: =Parent.Width - 48
+            Height: =70
+            Fill: =RGBA(239, 246, 255, 1)
+            BorderRadius: =12
+            BorderColor: =RGBA(191, 219, 254, 1)
+            BorderThickness: =1
+            PaddingTop: =12
+            PaddingBottom: =12
+            PaddingLeft: =16
+            PaddingRight: =16
+            
+            lblProTipLabel As label:
+                X: =0
+                Y: =0
+                Width: =80
+                Height: =18
+                Text: ="Pro Tip"
+                Size: =13
+                FontWeight: =FontWeight.Bold
+                Color: =RGBA(30, 64, 175, 1)
+            
+            lblProTipText As label:
+                X: =0
+                Y: =20
+                Width: =Parent.Width - 32
+                Height: =30
+                Text: '="Every phrase scores points, but only 4 are optimal. A perfect prompt covers: goal, environment, context, and plan."'
+                Size: =12
+                Color: =RGBA(15, 23, 42, 1)

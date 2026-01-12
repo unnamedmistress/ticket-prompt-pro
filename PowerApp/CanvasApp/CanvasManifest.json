@@ -1,0 +1,19 @@
+{
+  "FormatVersion": "1.343",
+  "Properties": {
+    "Author": "",
+    "Name": "Ticket Prompt Pro",
+    "Id": "/providers/Microsoft.PowerApps/apps/ticket-prompt-pro",
+    "FileID": "ticket-prompt-pro-app",
+    "LocalConnectionReferences": {},
+    "LocalDatabaseReferences": {}
+  },
+  "PCFControls": {},
+  "DynamoControlProperties": [],
+  "PublishInfo": {
+    "AppName": "Ticket Prompt Pro"
+  },
+  "PackageInfo": {
+    "Name": "Ticket Prompt Pro"
+  }
+}

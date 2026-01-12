@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<manifest>
+  <control namespace="BauschLomb" constructor="TicketPromptPro" version="0.0.1" display-name-key="Ticket Prompt Pro" description-key="A prompt-building training game for IT support scenarios" control-type="virtual" >
+    <external-service-usage enabled="false">
+    </external-service-usage>
+    <!-- Optional property for storing game results -->
+    <property name="gameScore" display-name-key="Game Score" description-key="The last game score achieved" of-type="Whole.None" usage="bound" required="false" />
+    <resources>
+      <code path="index.ts" order="1"/>
+      <platform-library name="React" version="16.14.0" />
+      <platform-library name="Fluent" version="9.68.0" />
+    </resources>
+  </control>
+</manifest>

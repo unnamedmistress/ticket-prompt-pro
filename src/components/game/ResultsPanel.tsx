@@ -1,6 +1,8 @@
 import { GameResult } from '@/types/game';
 import { getCoachMessage } from '@/utils/scoring';
-import { Trophy, Target, Clock, Star, Lightbulb } from 'lucide-react';
+import { Trophy, Target, Clock, Star, Lightbulb, Share2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 import { phrases } from '@/data/phrases';
 
 interface ResultsPanelProps {
@@ -9,6 +11,7 @@ interface ResultsPanelProps {
 }
 
 export function ResultsPanel({ result, formatTime }: ResultsPanelProps) {
+  const { toast } = useToast();
   const message = getCoachMessage(result);
   const isPerfect = result.optimalCount === 4;
   
@@ -16,6 +19,41 @@ export function ResultsPanel({ result, formatTime }: ResultsPanelProps) {
   const optimalPhrases = phrases.filter(p => p.optimal);
   const selectedLabels = new Set(result.selectedPhrases.map(p => p.label));
   const missedOptimal = optimalPhrases.filter(p => !selectedLabels.has(p.label));
+
+  const handleShare = async () => {
+    const shareText = `Ticket Prompt Pro Score: ${result.totalScore}/${result.maxPossible} pts (${result.percentage}%) | Optimal phrases: ${result.optimalCount}/4 | Time: ${formatTime(result.elapsedSeconds)}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Ticket Prompt Pro Score',
+          text: shareText,
+        });
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') {
+          await copyToClipboard(shareText);
+        }
+      }
+    } else {
+      await copyToClipboard(shareText);
+    }
+  };
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({
+        title: 'Copied to clipboard!',
+        description: 'Your score has been copied. Paste it anywhere to share!',
+      });
+    } catch {
+      toast({
+        title: 'Unable to copy',
+        description: 'Please manually copy your score.',
+        variant: 'destructive',
+      });
+    }
+  };
 
   return (
     <section className="rounded-lg sm:rounded-xl border border-border bg-secondary/30 p-3 sm:p-4">
@@ -28,12 +66,23 @@ export function ResultsPanel({ result, formatTime }: ResultsPanelProps) {
           )}
           <span className="font-semibold text-base sm:text-lg">Results</span>
         </div>
-        <div className={`rounded-full px-3 sm:px-4 py-1 font-bold text-sm sm:text-lg ${
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleShare}
+            className="flex items-center gap-1.5"
+          >
+            <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="hidden xs:inline">Share</span>
+          </Button>
+          <div className={`rounded-full px-3 sm:px-4 py-1 font-bold text-sm sm:text-lg ${
           isPerfect 
             ? 'bg-yellow-100 text-yellow-700 border border-yellow-300' 
             : 'bg-[hsl(var(--success-bg))] text-[hsl(var(--success-foreground))] border border-[hsl(var(--success-border))]'
         }`}>
-          {result.totalScore} / {result.maxPossible} pts
+            {result.totalScore} / {result.maxPossible} pts
+          </div>
         </div>
       </div>
 

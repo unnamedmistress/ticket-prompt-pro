@@ -1,0 +1,19 @@
+{
+  "QualifiedValues": [
+    {
+      "Namespace": "Chatbots (Forms)",
+      "Kind": "default.cds_cr0b0_chatbot_forms",
+      "Values": {}
+    },
+    {
+      "Namespace": "User Interactions (Forms)",
+      "Kind": "default.cds_cr0b0_userinteraction_forms",
+      "Values": {}
+    },
+    {
+      "Namespace": "Feedbacks (Forms)",
+      "Kind": "default.cds_cr0b0_feedback_forms",
+      "Values": {}
+    }
+  ]
+}
