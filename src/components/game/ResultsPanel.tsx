@@ -1,8 +1,14 @@
+import { useState } from 'react';
 import { GameResult } from '@/types/game';
 import { getCoachMessage } from '@/utils/scoring';
-import { Trophy, Target, Clock, Star, Lightbulb, Share2 } from 'lucide-react';
+import { Trophy, Target, Clock, Star, Lightbulb, Share2, Copy, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { phrases } from '@/data/phrases';
 
 interface ResultsPanelProps {
@@ -11,7 +17,8 @@ interface ResultsPanelProps {
 }
 
 export function ResultsPanel({ result, formatTime }: ResultsPanelProps) {
-  const { toast } = useToast();
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [copied, setCopied] = useState(false);
   const message = getCoachMessage(result);
   const isPerfect = result.optimalCount === 4;
   
@@ -20,38 +27,31 @@ export function ResultsPanel({ result, formatTime }: ResultsPanelProps) {
   const selectedLabels = new Set(result.selectedPhrases.map(p => p.label));
   const missedOptimal = optimalPhrases.filter(p => !selectedLabels.has(p.label));
 
-  const handleShare = async () => {
-    const shareText = `Ticket Prompt Pro Score: ${result.totalScore}/${result.maxPossible} pts (${result.percentage}%) | Optimal phrases: ${result.optimalCount}/4 | Time: ${formatTime(result.elapsedSeconds)}`;
-    
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'Ticket Prompt Pro Score',
-          text: shareText,
-        });
-      } catch (err) {
-        if ((err as Error).name !== 'AbortError') {
-          await copyToClipboard(shareText);
-        }
-      }
-    } else {
-      await copyToClipboard(shareText);
-    }
+  const getScoreEmoji = () => {
+    if (isPerfect) return '🏆';
+    if (result.percentage >= 80) return '🌟';
+    if (result.percentage >= 60) return '👍';
+    if (result.percentage >= 40) return '💪';
+    return '📝';
   };
 
-  const copyToClipboard = async (text: string) => {
+  const shareText = `${getScoreEmoji()} Ticket Prompt Pro\n\nScore: ${result.totalScore}/${result.maxPossible} pts (${result.percentage}%)\nOptimal: ${result.optimalCount}/4 ⭐\nTime: ${formatTime(result.elapsedSeconds)} ⏱️\n\n${isPerfect ? '🎉 Perfect Score!' : 'Can you beat my score?'}`;
+
+  const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(text);
-      toast({
-        title: 'Copied to clipboard!',
-        description: 'Your score has been copied. Paste it anywhere to share!',
-      });
+      await navigator.clipboard.writeText(shareText);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast({
-        title: 'Unable to copy',
-        description: 'Please manually copy your score.',
-        variant: 'destructive',
-      });
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = shareText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
@@ -70,7 +70,7 @@ export function ResultsPanel({ result, formatTime }: ResultsPanelProps) {
           <Button
             variant="outline"
             size="sm"
-            onClick={handleShare}
+            onClick={() => setShowShareModal(true)}
             className="flex items-center gap-1.5"
           >
             <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -85,6 +85,40 @@ export function ResultsPanel({ result, formatTime }: ResultsPanelProps) {
           </div>
         </div>
       </div>
+
+      {/* Share Modal */}
+      <Dialog open={showShareModal} onOpenChange={setShowShareModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <span className="text-3xl">{getScoreEmoji()}</span>
+              Share Your Score
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="bg-secondary/50 rounded-lg p-4 text-center space-y-2">
+              <div className="text-4xl mb-2">{getScoreEmoji()}</div>
+              <div className="text-2xl font-bold">{result.totalScore}/{result.maxPossible} pts</div>
+              <div className="text-lg text-muted-foreground">{result.percentage}% Score</div>
+              <div className="flex justify-center gap-4 text-sm">
+                <span>⭐ {result.optimalCount}/4 Optimal</span>
+                <span>⏱️ {formatTime(result.elapsedSeconds)}</span>
+              </div>
+              {isPerfect && <div className="text-yellow-600 font-semibold mt-2">🎉 Perfect Score!</div>}
+            </div>
+            <div className="bg-muted rounded-lg p-3">
+              <pre className="text-xs whitespace-pre-wrap font-mono">{shareText}</pre>
+            </div>
+            <Button onClick={handleCopy} className="w-full" variant={copied ? "secondary" : "default"}>
+              {copied ? (
+                <>✓ Copied!</>
+              ) : (
+                <><Copy className="w-4 h-4 mr-2" /> Copy to Clipboard</>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-3 mb-3 sm:mb-4">
         <div className="bg-card rounded-lg p-2 sm:p-3 text-center border border-border">
